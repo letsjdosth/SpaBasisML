@@ -73,62 +73,62 @@ designMat_cv = np.c_[Xmat_cv, TPSmat_cv]
 
 
 
-# # EDA: figures
-# fig, (ax1, ax2, ax3) = plt.subplots(1,3)
-# ax1.scatter(gridLoc_complete[:,0], gridLoc_complete[:,1], c="blue", s=(Wmat+abs(np.min(Wmat)))*3)
-# ax1.set_title("RE(Wmat)")
-# ax2.scatter(gridLoc_complete[:,0], gridLoc_complete[:,1], c="blue", s=Zmat_intensity)
-# ax2.set_title("Intensity:Expected Obs")
-# ax3.scatter(gridLoc_complete[:,0], gridLoc_complete[:,1], c="blue", s=Zmat)
-# ax3.set_title("Obs")
-# plt.show()
+# EDA: figures
+fig, (ax1, ax2, ax3) = plt.subplots(1,3)
+ax1.scatter(gridLoc_complete[:,0], gridLoc_complete[:,1], c="blue", s=(Wmat+abs(np.min(Wmat)))*3)
+ax1.set_title("RE(Wmat)")
+ax2.scatter(gridLoc_complete[:,0], gridLoc_complete[:,1], c="blue", s=Zmat_intensity)
+ax2.set_title("Intensity:Expected Obs")
+ax3.scatter(gridLoc_complete[:,0], gridLoc_complete[:,1], c="blue", s=Zmat)
+ax3.set_title("Obs")
+plt.show()
 
 
-# #glm fit
-# glm_pois = sm.GLM(Zmat[ind_data], np.c_[np.ones(n_data), designMat_data], family=sm.families.Poisson())
-# glm_result = glm_pois.fit()
-# print(glm_result.summary())
-# # print(glm_result.params)
-# glm_param = np.array(glm_result.params, dtype=float)
-# glm_TPSparam = np.array(glm_result.params[3:], dtype=float)
-# # print(glm_TPSparam)
+#glm fit
+glm_pois = sm.GLM(Zmat[ind_data], np.c_[np.ones(n_data), designMat_data], family=sm.families.Poisson())
+glm_result = glm_pois.fit()
+print(glm_result.summary())
+# print(glm_result.params)
+glm_param = np.array(glm_result.params, dtype=float)
+glm_TPSparam = np.array(glm_result.params[3:], dtype=float)
+# print(glm_TPSparam)
 
 
-# # GLM: plot the fit result
-# fig2, ((ax11, ax12, ax13, ax14), (ax21, ax22, ax23, ax24)) = plt.subplots(2,4)
-# ax11.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=Wmat[ind_data])
-# ax11.set_title("Wmat:data")
+# GLM: plot the fit result
+fig2, ((ax11, ax12, ax13, ax14), (ax21, ax22, ax23, ax24)) = plt.subplots(2,4)
+ax11.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=Wmat[ind_data]+abs(np.min(Wmat[ind_data])))
+ax11.set_title("Wmat:data")
 
-# ax12.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=Wmat[ind_cv])
-# ax12.set_title("Wmat:cv")
+ax12.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=Wmat[ind_cv]+abs(np.min(Wmat[ind_cv])))
+ax12.set_title("Wmat:cv")
 
-# ax13.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=Zmat[ind_data])
-# ax13.set_title("Zmat:data")
+ax13.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=Zmat[ind_data])
+ax13.set_title("Zmat:data")
 
-# ax14.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=Zmat[ind_cv])
-# ax14.set_title("Zmat:cv")
+ax14.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=Zmat[ind_cv])
+ax14.set_title("Zmat:cv")
 
-# estimatedWmat_data = np.matmul(TPSmat_data, glm_TPSparam)
-# ax21.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=estimatedWmat_data)
-# ax21.set_title("FIT:Wmat:data")
+estimatedWmat_data = np.matmul(TPSmat_data, glm_TPSparam)
+ax21.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=estimatedWmat_data+abs(np.min(estimatedWmat_data)))
+ax21.set_title("FIT:Wmat:data")
 
-# estimatedWmat_cv = np.matmul(TPSmat_cv, glm_TPSparam)
-# ax22.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=estimatedWmat_cv)
-# ax22.set_title("EST:Wmat:cv")
+estimatedWmat_cv = np.matmul(TPSmat_cv, glm_TPSparam)
+ax22.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=estimatedWmat_cv+abs(np.min(estimatedWmat_cv)))
+ax22.set_title("EST:Wmat:cv")
 
-# estimatedZmat_data = np.exp(np.matmul(np.c_[np.ones(n_data), designMat_data], glm_param))
-# ax23.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=estimatedZmat_data)
-# ax23.set_title("FIT:Zmat:data")
+estimatedZmat_data = np.exp(np.matmul(np.c_[np.ones(n_data), designMat_data], glm_param))
+ax23.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=estimatedZmat_data)
+ax23.set_title("FIT:Zmat:data")
 
-# estimatedZmat_cv = np.exp(np.matmul(np.c_[np.ones(n_cv), designMat_cv], glm_param))
-# ax24.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=estimatedZmat_cv)
-# ax24.set_title("EST:Zmat:cv")
+estimatedZmat_cv = np.exp(np.matmul(np.c_[np.ones(n_cv), designMat_cv], glm_param))
+ax24.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=estimatedZmat_cv)
+ax24.set_title("EST:Zmat:cv")
 
-# plt.show()
+plt.show()
 
-# # MSE
-# glmMSE_data = sum((estimatedZmat_data - Zmat[ind_data])**2)/n_data
-# glmMSE_CV = sum((estimatedZmat_cv - Zmat[ind_cv])**2)/n_cv
+# MSE
+glmMSE_data = sum((estimatedZmat_data - Zmat[ind_data])**2)/n_data
+glmMSE_CV = sum((estimatedZmat_cv - Zmat[ind_cv])**2)/n_cv
 
 
 # ML fit
@@ -175,5 +175,4 @@ ax04.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=ML_prediction_Y_cv)
 ax04.set_title("crossval:Predict")
 plt.show()
 
-# print("glm loss - data fit:", glmMSE_data, " cv:", glmMSE_CV)
-print("glm loss - data fit: 13.688539581526333  cv: 46.01889436984242")
+print("glm loss - data fit:", glmMSE_data, " cv:", glmMSE_CV)
