@@ -1767,6 +1767,8 @@ def deepGLMpredict(mdl,X_,
     # Add column of 1 to X if intercept is true
     if (intercept):
         X = concatenate([ones([X_.shape[0],1]),X_], axis=1)
+    else:
+        X = X_
 
     # Store Nsample to deepGLMfit
     mdl.Nsample = Nsample
@@ -1906,23 +1908,23 @@ designMatWithOne_cv = np.c_[np.ones((500,1)), Xmat_cv, TPSmat_cv]
 
 
 # poisson data (goal)
-# X = designMat_data
-# y = toVector(Zmat[ind_data])
-# X_test = designMat_cv
-# y_test = toVector(Zmat[ind_cv])
-
-# normal data (test)
 X = designMatWithOne_data
-y = toVector(Wmat[ind_data])
+y = toVector(Zmat[ind_data])
 X_test = designMatWithOne_cv
-y_test = toVector(Wmat[ind_cv])
-# print(min(y), max(y)) # [-2.5016579] [2.70618934]
+y_test = toVector(Zmat[ind_cv])
+
+# # normal data (test)
+# X = designMatWithOne_data
+# y = toVector(Wmat[ind_data])
+# X_test = designMatWithOne_cv
+# y_test = toVector(Wmat[ind_cv])
+# # print(min(y), max(y)) # [-2.5016579] [2.70618934]
 
 
 nn = [6,6]
 
 mdl = deepGLMfit(X,y,  
-                 dist = 'normal',
+                 dist = 'poisson',
                  network   =nn, 
                  lrate     =0.01,           
                  verbose   =10,             # Display training result each iteration
@@ -1949,19 +1951,40 @@ deepGLMplot('Shrinkage',mdl.out.shrinkage,linewidth=2)
 ## Prediction on test data
 # Make prediction (point estimation) on a test set
 print('---------- Prediction ----------')
-Pred1 = deepGLMpredict(mdl,X_test)
+
+
+
+
 
 # If ytest is specified (for model evaluation purpose)
 # then we can check PPS and MSE on test set
+
+Pred1 = deepGLMpredict(mdl,X)
 Pred2 = deepGLMpredict(mdl,X_test, y_test)
 print('PPS on test set using deepGLM is: %s' % Pred2.pps)
 print('MSE on test set using deepGLM is: %s' % Pred2.mse)
 
-# Estimate prediction interval for entire test data
-# Pred4 = deepGLMpredict(mdl,X_test, y=y_test, alpha=1, Nsample=1000)                       
-# y_pred = toVector(mean(Pred4.yhatMatrix, axis=0))
-# mse2 = toVector(mean(power(y_test-y_pred,2), axis=0))
-# accuracy = ((y_test<toVector(Pred4.interval[:,1])) & (y_test>toVector(Pred4.interval[:,0])))
-# print('Prediction Interval accuracy: %s' % (sum(accuracy)/len(accuracy)))
+ML_prediction_Y_datapt = Pred1.yhat
+ML_prediction_Y_cv = Pred2.yhat
 
-# deepGLMplot('Interval', Pred4, y=y_test)
+fig3, ((ax01, ax02), (ax03, ax04)) = plt.subplots(2,2)
+ax01.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=y)
+ax01.set_title("datapoint:Obs")
+ax02.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=ML_prediction_Y_datapt)
+ax02.set_title("datapoint:ModelFit")
+ax03.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=y_test)
+ax03.set_title("crossval:Obs")
+ax04.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=ML_prediction_Y_cv)
+ax04.set_title("crossval:Predict")
+plt.show()
+
+
+
+# # Estimate prediction interval for entire test data
+# # Pred4 = deepGLMpredict(mdl,X_test, y=y_test, alpha=1, Nsample=1000)                       
+# # y_pred = toVector(mean(Pred4.yhatMatrix, axis=0))
+# # mse2 = toVector(mean(power(y_test-y_pred,2), axis=0))
+# # accuracy = ((y_test<toVector(Pred4.interval[:,1])) & (y_test>toVector(Pred4.interval[:,0])))
+# # print('Prediction Interval accuracy: %s' % (sum(accuracy)/len(accuracy)))
+
+# # deepGLMplot('Interval', Pred4, y=y_test)
