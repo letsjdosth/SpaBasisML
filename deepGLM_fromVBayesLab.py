@@ -1952,10 +1952,6 @@ deepGLMplot('Shrinkage',mdl.out.shrinkage,linewidth=2)
 # Make prediction (point estimation) on a test set
 print('---------- Prediction ----------')
 
-
-
-
-
 # If ytest is specified (for model evaluation purpose)
 # then we can check PPS and MSE on test set
 
