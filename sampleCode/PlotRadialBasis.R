@@ -17,7 +17,7 @@ plotRF<-function(dat,rangeDat,label,location,length.out=10){
 
 # Basis functions representations
 set.seed(123456)
-nRank= 20; nMod<-5000 ; nCV<-floor(nMod*0.2)
+nRank= 25; nMod<-1000 ; nCV<-floor(nMod*0.2)
 indRank<-1:nRank ; indMod<-(nRank+1):(nRank+nMod) ; indCV<-(nRank+nMod+1):(nRank+nMod+nCV)
 gridLocationRank<-as.matrix(expand.grid(seq(0,1,length.out = sqrt(nRank)),seq(0,1,length.out = sqrt(nRank))))
 gridLocationMod<-cbind(runif(nMod),runif(nMod))
@@ -27,8 +27,8 @@ phi=0.2; sigma2=1
 gridLocationComplete<-rbind(gridLocationRank,gridLocationMod,gridLocationCV)
 distMat<-as.matrix(rdist(gridLocationComplete))
 covMat<-(1+(sqrt(5)*(distMat/phi))+((5*distMat^2)/(3*(phi^2))))*exp(-(sqrt(5)*(distMat/phi)))
-# covMat<-exp(-(distMat/phi))
-covMat<-sigma2*covMat
+covMat<-exp(-(distMat/phi))
+# covMat<-sigma2*covMat
 TSseed<-rnorm(nRank+nMod+nCV)
 w<-t(chol(covMat))%*%TSseed
 z<-sapply(exp(w),rpois,n=1)
@@ -49,6 +49,10 @@ plotRF(dat=w[indCV],rangeDat=w[indCV],label="Validation",location=gridLocationCo
 distMat<-as.matrix(dist(gridLocationComplete))
 distBasis<-distMat[c(indMod),indRank]
 dim(distBasis)
+
+####################################################################################################################################
+
+
 # GAussian
 phi<-3
 gaussBasis<-function(phi,dist){

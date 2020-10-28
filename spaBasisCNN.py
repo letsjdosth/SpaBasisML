@@ -68,8 +68,79 @@ def test_data_generator(n_knot=100, n_data=1000, n_cv=500, seed_val=12345):
     Zmat_data = Zmat[ind_data]
     Zmat_cv = Zmat[ind_cv]
     return (designMat_data, Zmat_data, gridLoc_data, designMat_cv, Zmat_cv, gridLoc_cv)
+#########################################################
+# main
+
+
+def to_gray_image(input_designMat, covariate_dim, outputimage_2d_dim=(10,10)):
+    return_gray_image_list = []
+    for i in range(len(input_designMat[:,covariate_dim:])):
+        now_image = input_designMat[i,covariate_dim:]
+        now_image = now_image.reshape(outputimage_2d_dim)
+        return_gray_image_list.append(now_image)
+    return return_gray_image_list
+
+
+#RGB converting (linearly)
+def from_gray_to_rgb_image_Thinplate(input_gray_image_list):
+    #thinplate obs max-min
+    # print(np.max(designMat_data[:,2:]), np.min(designMat_data[:,2:]))
+    # 0.6238621017222477 -0.18393972058459956
+    #thinplate theoretical max-min
+    # print(max_TPSval, min_TPSval, range_TPSval)
+    # 0.6931471805599455 -0.18393972058572117 0.8770869011456667
+    max_TPSval = (math.sqrt(2)**2) * (np.log(math.sqrt(2)))
+    min_TPSval = np.exp(-1) * (-0.5)
+    range_TPSval = max_TPSval - min_TPSval
+
+    return_rgb_image_list = []
+    for gray_image in input_gray_image_list:
+        # red_mat = (gray_image - min_TPSval) / range_TPSval
+        # blue_mat = (1 - ((gray_image - min_TPSval) / range_TPSval))
+        # green_mat = abs(0.5-((gray_image - min_TPSval) / range_TPSval))
+
+        
+        blue_mat = np.exp(-(gray_image - min_TPSval) / range_TPSval)
+        red_mat = 1-blue_mat/2
+        green_mat = np.zeros((10,10,3))
+        rgb_image = np.dstack((red_mat, green_mat, blue_mat))
+        return_rgb_image_list.append(rgb_image)
+    # print(return_rgb_image_list_data[0].shape) #(10, 10, 3)
+    return return_rgb_image_list
+
+if __name__ == "__main__":
+    (designMat_data, Zmat_data, gridLoc_data, designMat_cv, Zmat_cv, gridLoc_cv) = test_data_generator()
+
+    gray_image_list_data = to_gray_image(designMat_data, 2, (10,10))
+    gray_image_list_cv = to_gray_image(designMat_cv, 2, (10,10))
+
+
+    # gray image plot
+    # fig1, ((ax101, ax102), (ax103, ax104)) = plt.subplots(2,2)
+    # print(gray_image_list_data[0])
+    # ax101.matshow(gray_image_list_data[0], cmap='gray')
+    # ax102.matshow(gray_image_list_data[1], cmap='gray')
+    # ax103.matshow(gray_image_list_data[2], cmap='gray')
+    # ax104.matshow(gray_image_list_data[3], cmap='gray')
+    # plt.show()
 
 
 
-# EDA: figures
-(designMat_data, Zmat_data, gridLoc_data, designMat_cv, Zmat_cv, gridLoc_cv) = test_data_generator()
+    rgb_image_list_data = from_gray_to_rgb_image_Thinplate(gray_image_list_data)
+    rgb_image_list_cv = from_gray_to_rgb_image_Thinplate(gray_image_list_cv)
+
+    #rgb image plot
+    for i in range(0,30,10):
+        fig2, ((ax201, ax202, ax203, ax204, ax205), (ax206, ax207, ax208, ax209, ax210)) = plt.subplots(2,5)
+        ax201.imshow(rgb_image_list_data[i])
+        ax202.imshow(rgb_image_list_data[i+1])
+        ax203.imshow(rgb_image_list_data[i+2])
+        ax204.imshow(rgb_image_list_data[i+3])
+        ax205.imshow(rgb_image_list_data[i+4])
+        ax206.imshow(rgb_image_list_data[i+5])
+        ax207.imshow(rgb_image_list_data[i+6])
+        ax208.imshow(rgb_image_list_data[i+7])
+        ax209.imshow(rgb_image_list_data[i+8])
+        ax210.imshow(rgb_image_list_data[i+9])
+        plt.show()
+
