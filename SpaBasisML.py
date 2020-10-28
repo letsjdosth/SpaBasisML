@@ -134,7 +134,7 @@ glmMSE_CV = sum((estimatedZmat_cv - Zmat[ind_cv])**2)/n_cv
 # ML fit
 print(designMat_data.shape) #1000, 102
 
-inputs = keras.Input(shape=(102,), name="x_basis")
+inputs = keras.Input(shape=(102,), name="x_basis")#고침
 x1 = layers.Dense(100, activation="relu")(inputs)
 x2 = layers.Dense(50, activation="relu")(x1)
 x3 = layers.Dense(20, activation="relu")(x2)
@@ -143,9 +143,9 @@ MLmodel = keras.Model(inputs=inputs, outputs=outputs)
 
 MLmodel.summary()
 
-train_X = designMat_data
+train_X = designMat_data #고침
 train_Y = Zmat[ind_data]
-cv_X = designMat_cv
+cv_X = designMat_cv #고침
 cv_Y = Zmat[ind_cv]
 
 
