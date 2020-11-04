@@ -1,8 +1,6 @@
 # SpaBasisML
-안녕하세요~!
 
 ## Dependency
-
 
 Python 3.7 (64 bit)
 
