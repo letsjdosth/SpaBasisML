@@ -11,11 +11,6 @@ import matplotlib.pyplot as plt
 #FOR GLM
 import statsmodels.api as sm
 
-#FOR ML
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-
 
 n_knot = 100 # set n**2 form, where n is natural number
 n_data = 1000
@@ -129,50 +124,3 @@ plt.show()
 # MSE
 glmMSE_data = sum((estimatedZmat_data - Zmat[ind_data])**2)/n_data
 glmMSE_CV = sum((estimatedZmat_cv - Zmat[ind_cv])**2)/n_cv
-
-
-# ML fit
-print(designMat_data.shape) #1000, 102
-
-inputs = keras.Input(shape=(102,), name="x_basis")#고침
-x1 = layers.Dense(100, activation="relu")(inputs)
-x2 = layers.Dense(50, activation="relu")(x1)
-x3 = layers.Dense(20, activation="relu")(x2)
-outputs = layers.Dense(1, name="predictions")(x3)
-MLmodel = keras.Model(inputs=inputs, outputs=outputs)
-
-MLmodel.summary()
-
-train_X = designMat_data #고침
-train_Y = Zmat[ind_data]
-cv_X = designMat_cv #고침
-cv_Y = Zmat[ind_cv]
-
-
-MLmodel.compile(
-    loss=keras.losses.MeanSquaredError(),
-    optimizer=keras.optimizers.Adam(learning_rate=0.005),
-    metrics=["MeanSquaredError","MeanAbsoluteError"],
-)
-
-print("fit!")
-history = MLmodel.fit(train_X, train_Y, batch_size=1000, epochs=700, validation_split=0.2)
-print("eval! (data+cv)")
-fit_scores = MLmodel.evaluate(train_X, train_Y, verbose=2)
-test_scores = MLmodel.evaluate(cv_X, cv_Y, verbose=2)
-ML_prediction_Y_datapt = MLmodel.predict(train_X)
-ML_prediction_Y_cv = MLmodel.predict(cv_X)
-
-# ML: figures
-fig3, ((ax01, ax02), (ax03, ax04)) = plt.subplots(2,2)
-ax01.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=train_Y)
-ax01.set_title("datapoint:Obs")
-ax02.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=ML_prediction_Y_datapt)
-ax02.set_title("datapoint:ModelFit")
-ax03.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=cv_Y)
-ax03.set_title("crossval:Obs")
-ax04.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=ML_prediction_Y_cv)
-ax04.set_title("crossval:Predict")
-plt.show()
-
-print("glm loss - data fit:", glmMSE_data, " cv:", glmMSE_CV)
