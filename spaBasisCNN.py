@@ -155,23 +155,35 @@ if __name__ == "__main__":
     X_cv_covariate = np.reshape(designMat_cv[:,:2], (500,2,1))
     X_cv_basis = np.reshape(designMat_cv[:,2:], (500,100,1))
 
+    print(np.max(X_train_covariate), np.min(X_train_covariate))
+
     image_input = layers.Input(shape=(100,1))
     other_input = layers.Input(shape=(2,))
     
     conv1 = layers.Conv1D(16, 6, activation='relu')(image_input)
     conv1 = layers.MaxPooling1D()(conv1)
+    conv1 = layers.Dropout(0.2)(conv1)
     conv2 = layers.Conv1D(32, 6, activation='relu')(conv1)
     conv2 = layers.MaxPooling1D()(conv2)
+    conv2 = layers.Dropout(0.2)(conv2)
     first_part_output = layers.Flatten()(conv2)
     merged_model = layers.concatenate([first_part_output, other_input])
     merged1 = layers.Dense(512, activation='relu')(merged_model)
     last_layer = layers.Dense(1, activation='relu')(merged1)
 
+    class DeepEnsemblesLossFunction(keras.losses.Loss):
+        def call(self, y_true, y_pred):
+            y_true = keras.backend.cast(y_true, 'float32')
+            y_pred = keras.backend.cast(y_pred, 'float32')
+            # return keras.backend.log(keras.backend.var(y_pred))/2 + keras.backend.square(y_true- keras.backend.mean(y_pred))/(2*keras.backend.var(y_pred))
+            return keras.backend.log(keras.backend.var(y_pred))/2 + keras.backend.sum(keras.backend.square(y_true- keras.backend.mean(y_pred)), axis=0)/(2*keras.backend.var(y_pred))
+
     CNN_model = keras.Model(inputs=[image_input, other_input], outputs = last_layer)
     CNN_model.summary()
 
     CNN_model.compile(optimizer='adam',
-              loss='mse',
+              loss=DeepEnsemblesLossFunction(),
+            #   loss='mse',
               metrics=['accuracy'])
 
     model_fit = CNN_model.fit([X_train_basis, X_train_covariate], Zmat_data, epochs=300)
@@ -182,20 +194,18 @@ if __name__ == "__main__":
 
     CNN_prediction_Y_datapt = CNN_model.predict([X_train_basis, X_train_covariate])
     CNN_prediction_Y_cv = CNN_model.predict([X_cv_basis, X_cv_covariate])
-    print(CNN_prediction_Y_datapt.shape)
-    print(CNN_prediction_Y_datapt[1:2,:])
     
-    print(CNN_prediction_Y_cv.shape)
 
     # ML: figures
     fig3, ((ax01, ax02), (ax03, ax04)) = plt.subplots(2,2)
-    ax01.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=Zmat_data)
+    ax01.scatter(gridLoc_data[:,0], gridLoc_data[:,1], s=Zmat_data, c=Zmat_data/max(Zmat_data), cmap="Reds")
     ax01.set_title("datapoint:Obs")
-    ax02.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=CNN_prediction_Y_datapt)
+    ax02.scatter(gridLoc_data[:,0], gridLoc_data[:,1], s=CNN_prediction_Y_datapt, c=np.reshape(CNN_prediction_Y_datapt,(1000,)), cmap="Reds")
     ax02.set_title("datapoint:ModelFit")
-    ax03.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=Zmat_cv)
+    
+    ax03p = ax03.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], s=Zmat_cv, c=Zmat_cv/max(Zmat_cv), cmap="Reds")
     ax03.set_title("crossval:Obs")
-    ax04.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], c="blue", s=CNN_prediction_Y_cv)
+    ax04.scatter(gridLoc_cv[:,0], gridLoc_cv[:,1], s=CNN_prediction_Y_cv, c=np.reshape(CNN_prediction_Y_cv,(500,)), cmap="Reds")
     ax04.set_title("crossval:Predict")
     plt.show()
 
