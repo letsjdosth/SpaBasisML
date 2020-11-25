@@ -38,7 +38,9 @@ covMat <- (1+(sqrt(5)*(distMat/phi))+((5*distMat^2)/(3*(phi^2))))*exp(-(sqrt(5)*
 covMat <- sigma2*covMat
 TSseed <- rnorm(nRank+nMod+nCV) # Matern type cov
 w <- t(chol(covMat))%*%TSseed
-z <- sapply(exp(w+XMatComplete%*%beta),rpois,n=1)
+
+z <- sapply(1 / (1 +exp(-(XMatComplete %*% beta + w))), rbinom, n=1, size=1) #binom
+# z <- sapply(exp(w+XMatComplete%*%beta),rpois,n=1) #pois
 #z=pois(exp(w+Xb)), w~N(0,1)*MaternCov
 
 # thin plate splinte basis
@@ -65,7 +67,7 @@ plotRF(dat=w[indCV],rangeDat=w[indCV],label="Validation",location=gridLocationCo
 
 
 # glm fits without penalties
-glmfit <- glm(z[indMod]~ -1+DesignMat, family="poisson")
+glmfit <- glm(z[indMod]~ -1+DesignMat, family="binomial")
 summary(glmfit)
 
 par(mfrow=c(2,4))

@@ -48,7 +48,7 @@ def test_data_generator(n_knot=100, n_data=1000, n_cv=500, seed_val=12345, dist=
         Zmat = 8*Zmat_intensity
     elif dist == "binomial":
         Zmat_intensity = 1 / (1 +np.exp(-(Wmat + np.matmul(Xmat_complete, MaternCov_params['beta'])))) 
-        Zmat = randGenerator.binomial(30, Zmat_intensity)
+        Zmat = randGenerator.binomial(1, Zmat_intensity)
     else:
         raise ValueError(str(dist)+" is not implemented yet.")
 
