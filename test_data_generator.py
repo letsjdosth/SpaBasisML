@@ -78,7 +78,8 @@ def test_data_generator(n_knot=100, n_data=1000, n_cv=500, seed_val=12345, dist=
 if __name__=="__main__":
     import matplotlib.pyplot as plt
 
-    (designMat_data, Zmat_data, gridLoc_data, designMat_cv, Zmat_cv, gridLoc_cv) = test_data_generator(dist="poisson")
+    (designMat_data, Zmat_data, gridLoc_data, designMat_cv, Zmat_cv, gridLoc_cv) = test_data_generator(dist="binomial")
+    
     # EDA: figures
     fig, (ax1, ax2) = plt.subplots(2,1)
     ax1.scatter(gridLoc_data[:,0], gridLoc_data[:,1], c="blue", s=Zmat_data)
