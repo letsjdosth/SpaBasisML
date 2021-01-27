@@ -69,7 +69,10 @@ def simulate_data(n_data, n_cv, true_coefficient, dist="poisson", seed_val=12345
     else:
         raise ValueError(str(dist)+" is not implemented yet.")
     
-    return Xmat_data, Zmat[0:n_data,], gridLoc_data, gridTime_data, Xmat_cv, Zmat[n_data:,], gridLoc_cv, gridTime_cv
+    y_data = Zmat[0:n_data,].reshape(n_data,1)
+    y_cv = Zmat[n_data:,].reshape(n_cv,1)
+
+    return Xmat_data, y_data, gridLoc_data, gridTime_data, Xmat_cv, y_cv, gridLoc_cv, gridTime_cv
 
 def convert_latlontime_to_basis(covlonlattime_design_mat, lonlat_knot, time_knot):
     location_data = covlonlattime_design_mat[:, -3:-1]
@@ -96,6 +99,7 @@ def convert_latlontime_to_basis(covlonlattime_design_mat, lonlat_knot, time_knot
 
 
 if __name__=="__main__":
+    # example 1 : with given data, make design matrix with basis
     test_covlonlattime_design_mat = np.array([
         #cov  lon  lat  time
         [1.3, 0.1, 0.5, 0.1],
@@ -108,9 +112,16 @@ if __name__=="__main__":
     test_time_knot = np.array([0.25, 0.75])
     # convert_latlontime_to_basis(test_covlonlattime_design_mat, test_lonlat_knot, test_time_knot)
 
+    
+    # example 2 : with simulated data, make design matrix with basis
     test_true_coeff = [2,2]
-    test_designMat_data, test_Zmat_data, test_gridLoc_data, test_gridTime_data, test_designMat_cv, test_Zmat_cv, test_gridLoc_cv, test_gridTime_cv = simulate_data(100,50, test_true_coeff)
-    print(test_designMat_data.shape, test_Zmat_data.shape, test_gridLoc_data.shape, test_gridTime_data.shape,
-        test_designMat_cv.shape, test_Zmat_cv.shape, test_gridLoc_cv.shape, test_gridTime_cv.shape)
+    test_XMat_data, test_y_data, test_gridLoc_data, test_gridTime_data, test_XMat_cv, test_y_cv, test_gridLoc_cv, test_gridTime_cv = simulate_data(100,50, test_true_coeff)
+    print(test_XMat_data.shape, test_y_data.shape, test_gridLoc_data.shape, test_gridTime_data.shape,
+        test_XMat_cv.shape, test_y_cv.shape, test_gridLoc_cv.shape, test_gridTime_cv.shape)
 
-    test_designMat_data = 
+    
+    test_covlonlattime_design_mat = np.concatenate((test_XMat_data, test_gridLoc_data, test_gridTime_data), axis=1)
+    print(test_covlonlattime_design_mat.shape) #(100, 5) (covariate 2 + lon + lat + time)
+    test_covbasis_design_mat = convert_latlontime_to_basis(test_covlonlattime_design_mat, test_lonlat_knot, test_time_knot)
+    print(test_covbasis_design_mat.shape) #(100, 8) (covariate 2 + spatial basis 2 + time basis 2*2 (using harmonic basis))
+

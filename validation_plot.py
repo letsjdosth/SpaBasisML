@@ -15,6 +15,6 @@ def show_vavlidation_plot(gridLoc, true, predicted):
     fig, ((ax01, ax02)) = plt.subplots(1,2)
     ax01.scatter(gridLoc[:,0], gridLoc[:,1], s=1, c=(true - min(true))/(max(true) - min(true)), cmap="Reds")
     ax01.set_title("Obs:Validation")
-    ax02.scatter(gridLoc[:,0], gridLoc[:,1], s=1, c=, cmap="Reds")
+    ax02.scatter(gridLoc[:,0], gridLoc[:,1], s=1, c=(predicted - min(predicted))/(max(predicted) - min(predicted)), cmap="Reds")
     ax02.set_title("predicted")
     plt.show()
