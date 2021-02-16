@@ -66,7 +66,7 @@ if __name__=="__main__":
     #~glm, multiprocessing
     #detailed tuning should be conducted at glm_MCMC.py
 
-    core_num = 2
+    core_num = 4
     process_vec = []
     proc_queue = mp.Queue()
 
@@ -96,53 +96,4 @@ if __name__=="__main__":
     print("exit multiprocessing")
     
 
-
-
-
-
-    # #using pymc3
-        # with pm.Model() as GLM_model:
-    #     # define priors, weakly informative Normal
-    #     b0 = pm.Normal("b0_intercept", mu=0, sigma=100)
-    #     b1 = pm.Normal("b1_covariate1", mu=0, sigma=100)
-    #     b2 = pm.Normal("b2_covariate2", mu=0, sigma=100)
-    #     b3 = pm.Normal("b3_basis", mu=0, sigma=100)
-    #     b4 = pm.Normal("b4_basis", mu=0, sigma=100)
-    #     b5 = pm.Normal("b5_basis", mu=0, sigma=100)
-    #     b6 = pm.Normal("b6_basis", mu=0, sigma=100)
-    #     b7 = pm.Normal("b7_basis", mu=0, sigma=100)
-    #     b8 = pm.Normal("b8_basis", mu=0, sigma=100)
-    #     b9 = pm.Normal("b9_basis", mu=0, sigma=100)
-    #     b10 = pm.Normal("b10_basis", mu=0, sigma=100)
-    #     b11 = pm.Normal("b11_basis", mu=0, sigma=100)
-    #     b12 = pm.Normal("b12_basis", mu=0, sigma=100)
-    #     b13 = pm.Normal("b13_basis", mu=0, sigma=100)
-    #     b14 = pm.Normal("b14_basis", mu=0, sigma=100)
-
-    #     # define linear model and exp link function
-    #     theta = (
-    #         b0
-    #         + b1 * X_train_covariate[:,0]
-    #         + b2 * X_train_covariate[:,1]
-    #         + b3 * CNN_model_last_layer_prediction[:,0]
-    #         + b4 * CNN_model_last_layer_prediction[:,1]
-    #         + b5 * CNN_model_last_layer_prediction[:,2]
-    #         + b6 * CNN_model_last_layer_prediction[:,3]
-    #         + b7 * CNN_model_last_layer_prediction[:,4]
-    #         + b8 * CNN_model_last_layer_prediction[:,5]
-    #         + b9 * CNN_model_last_layer_prediction[:,6]
-    #         + b10 * CNN_model_last_layer_prediction[:,7]
-    #         + b11 * CNN_model_last_layer_prediction[:,8]
-    #         + b12 * CNN_model_last_layer_prediction[:,9]
-    #         + b13 * CNN_model_last_layer_prediction[:,10]
-    #         + b14 * CNN_model_last_layer_prediction[:,11]
-    #     )
-
-    #     ## Define Poisson likelihood
-    #     y = pm.Poisson("y", mu=np.exp(theta), observed=Zmat_data)
-    
-    # with GLM_model:
-    #     glm_model_fit = pm.sample(1000, tune=1000, return_inferencedata=True, cores=1) #<-do not operate on windows10 (multiprocessing problem)
-
-    # az.plot_trace(glm_model_fit)
 
