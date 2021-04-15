@@ -121,30 +121,42 @@ def image_transformer(image_array, filter_array):
     feature_array = np.reshape(feature_array, (len(image_array), len(filter_array)))
     return feature_array
 
+def simulation_data_generator(num_data, true_beta_vec, image_shape, seed_val=12345):
+    image_array = gp_image_generator(num_data, grid_shape_tuple=image_shape, matern_param_dict={"phi" : 15, "sigma2" : 1}, seed_val=seed_val*10)
+    basis_array = image_filter_generator([[0, 0], [40, 40], [10, 30], [20, 20]], grid_shape_tuple=image_shape, basis="invQuad", phi=0.1)
+    features_from_image = image_transformer(image_array, basis_array)
+    print(features_from_image.shape)
+
+    randGenerator = np.random.default_rng(seed=seed_val)
+    covariateMat = randGenerator.normal(loc=0.0, scale=1.0, size=(num_data, len(true_beta_vec)))
+    responseVec = np.matmul(covariateMat, true_beta_vec) + np.matmul(features_from_image, np.ones(features_from_image.shape[1]))
+    return covariateMat, image_array, responseVec
 
 if __name__=="__main__":
+    #test: image generator
     image_shape = (40,40)
     image_array = gp_image_generator(5, grid_shape_tuple=image_shape, matern_param_dict={"phi" : 15, "sigma2" : 1})
-    # fig1, ((ax101, ax102), (ax103, ax104)) = plt.subplots(2,2)
-    # ax101.matshow(image_array[0], cmap='gray') #흰색이 high value
-    # ax102.matshow(image_array[1], cmap='gray')
-    # ax103.matshow(image_array[2], cmap='gray')
-    # ax104.matshow(image_array[3], cmap='gray')
-    # plt.show()
+    fig1, ((ax101, ax102), (ax103, ax104)) = plt.subplots(2,2)
+    ax101.matshow(image_array[0], cmap='gray') #흰색이 high value
+    ax102.matshow(image_array[1], cmap='gray')
+    ax103.matshow(image_array[2], cmap='gray')
+    ax104.matshow(image_array[3], cmap='gray')
+    plt.show()
     
+    #test: filter generator
     basis_array = image_filter_generator([[0, 0], [40, 40], [10, 30], [20, 20]], grid_shape_tuple=image_shape, basis="invQuad", phi=0.1)
-    # fig1, ((ax101, ax102), (ax103, ax104)) = plt.subplots(2,2)
-    # ax101.matshow(basis_array[0], cmap='gray') #흰색이 high value
-    # ax102.matshow(basis_array[1], cmap='gray')
-    # ax103.matshow(basis_array[2], cmap='gray')
-    # ax104.matshow(basis_array[3], cmap='gray')
-    # plt.show()
+    fig1, ((ax101, ax102), (ax103, ax104)) = plt.subplots(2,2)
+    ax101.matshow(basis_array[0], cmap='gray') #흰색이 high value
+    ax102.matshow(basis_array[1], cmap='gray')
+    ax103.matshow(basis_array[2], cmap='gray')
+    ax104.matshow(basis_array[3], cmap='gray')
+    plt.show()
 
+    #test: image*filter
     feature = image_transformer(image_array, basis_array)
-
-    #for test
     choose_image_index = 1
-    print(feature[choose_image_index])
+    
+    print('check with plots!:', feature[choose_image_index])
     fig1, ((ax101, ax102), (ax103, ax104), (ax105, ax106), (ax107, ax108)) = plt.subplots(4,2)
     ax101.matshow(image_array[choose_image_index], cmap='gray') #흰색이 high value
     ax102.matshow(basis_array[0], cmap='gray')
@@ -155,3 +167,12 @@ if __name__=="__main__":
     ax107.matshow(image_array[choose_image_index], cmap='gray')
     ax108.matshow(basis_array[3], cmap='gray')
     plt.show()
+    #체크: 필터에서 흰색부분이, 이미지에서 흰색부분을 많이 포함하고있으면 숫자가 커야함
+    #   반대로 필터에서 흰색부분이, 이미지에서 검은색부분을 많이 포함하고있으면 숫자가 작아야함
+    #   터미널의 숫자출력과 비교!
+
+    #test: 
+    covariateMat, image_array, responseVec = simulation_data_generator(10, [1,1], (3,3))
+    print('covariate:\n', covariateMat)
+    print('image_0:\n',image_array[0])
+    print('y:\n', responseVec)
