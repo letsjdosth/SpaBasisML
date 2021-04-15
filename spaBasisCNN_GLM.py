@@ -47,11 +47,13 @@ if __name__=="__main__":
     #CNN model
     image_input = layers.Input(shape=(100,1))
     conv1 = layers.Conv1D(16, 6, activation='relu')(image_input)
-    conv1 = layers.MaxPooling1D()(conv1)
     conv1 = PermaDropout(0.2)(conv1)
+    conv1 = layers.MaxPooling1D()(conv1)
+    
     conv2 = layers.Conv1D(32, 6, activation='relu')(conv1)
-    conv2 = layers.MaxPooling1D()(conv2)
     conv2 = PermaDropout(0.2)(conv2)
+    conv2 = layers.MaxPooling1D()(conv2)
+    
     first_part_output = layers.Flatten()(conv2)
     merged1 = layers.Dense(12, activation='relu', name="last")(first_part_output)
     out_layer = layers.Dense(1, activation='relu')(merged1)

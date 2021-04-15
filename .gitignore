@@ -131,3 +131,7 @@ dmypy.json
 
 # sample code
 # sampleCode/
+
+#data
+EmoLab/
+NKI/
