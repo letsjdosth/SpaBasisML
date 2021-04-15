@@ -15,10 +15,7 @@ def PermaDropout(rate):
 
 #===================================================
 
-
 from glm_MCMC import glmMCMC
-
-
 from test_data_generator import test_data_generator
 
 # input data
@@ -81,7 +78,7 @@ if __name__=="__main__":
 
     CNN_model_last_layer_predictions = []
     for i in range(core_num):
-        CNN_model_prediction = CNN_model.predict(X_train_basis)
+        CNN_model_prediction = CNN_model.predict(X_train_basis) #<-cv basis?
         CNN_model_last_layer_predictions.append(np.array(CNN_model_prediction[0]))
         print("prediction:", i)
     

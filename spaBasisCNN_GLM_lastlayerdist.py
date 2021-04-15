@@ -63,7 +63,7 @@ for i in range(sample_num):
 CNN_model_last_layer_predictions_trace = np.array(CNN_model_last_layer_predictions).T
 
 
-fig, axs = plt.subplots(4, 3, sharey=True, tight_layout=True) #12 plots
+fig, axs = plt.subplots(4, 3, sharey=False, tight_layout=True) #12 plots
 for i in range(CNN_model_last_layer_predictions_trace.shape[0]):
     trace = CNN_model_last_layer_predictions_trace[i,:].flatten() #<-linter error
     axs[i//3, i%3].hist(trace, bins=50)
